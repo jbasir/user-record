@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model registros {
+  id                Int       @id @default(autoincrement())
+  nombre            String    @db.VarChar(100)
+  email             String    @db.VarChar(100)
+  mensaje           String   @db.Text
+  tipo_comprobante  TipoComprobante @default(Factura)
+  metodo_pago       MetodoPago @default(Efectivo)
+  comprobante_pago  String?   @db.VarChar(255)
+  fecha_creacion    DateTime  @default(now()) @db.Timestamp
+}
+
+enum TipoComprobante {
+  Factura
+  CFF
+  Ticket
+}
+
+enum MetodoPago {
+  Efectivo
+  Transferencia
+  Tarjeta
+}

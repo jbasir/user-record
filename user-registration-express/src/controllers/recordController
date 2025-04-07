@@ -1,0 +1,63 @@
+const recordService = require('../services/recordService');
+const { validateRegistration } = require('../utils/validation');
+
+const createRecord = async (req, res) => {
+  const validationResult = validateRegistration(req);
+  if (!validationResult.success) {
+    return res.status(400).json(validationResult);
+  }
+
+  const { nombre, email, mensaje, tipo_comprobante, metodo_pago } = req.body;
+  const comprobante_pago = req.file ? req.file.path : null;
+
+  try {
+    const result = await recordService.createRecord({
+      nombre,
+      email,
+      mensaje,
+      tipo_comprobante,
+      metodo_pago,
+      comprobante_pago
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Record created successfully',
+      data: {
+        id: result.id,
+        nombre: result.nombre,
+        email: result.email,
+        mensaje: result.mensaje,
+        tipo_comprobante: result.tipo_comprobante,
+        metodo_pago: result.metodo_pago,
+        comprobante_pago: result.comprobante_pago,
+        fecha_creacion: result.fecha_creacion
+      }
+    });
+
+  } catch (error) {
+    console.error('POST Error /registro:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+const getRecords = async (req, res) => {
+  try {
+    const result = await recordService.getAllRecords();
+    res.json(result);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      res.status(400).json({ error: 'Database error', details: error.meta });
+    } else {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+};
+
+module.exports = {
+  createRecord,
+  getRecords
+};
