@@ -4,6 +4,16 @@
 git clone https://github.com/jbasir/user-record
 ```
 
+## Local Development Setup
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn package manager
+- Angular
+- Prisma
+- MySQL database
+
+
 ## Run Frontend
 
 ## Step 1: Go to user-registration directory
@@ -65,7 +75,7 @@ cd user-registration-
 
 ```bash
 docker build -t user_registration_front .
-docker run -p 4300:80 user_registration_front
+docker run -d -p 4200:80 user_registration_front
 ```
 
 Run Backend with Docker
