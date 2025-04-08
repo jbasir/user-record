@@ -1,21 +1,28 @@
-FROM node:18-alpine AS build
+FROM node:18 AS build
 
-WORKDIR /app
+# Set the working directory
+WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
+# Copy the rest of the application code
 COPY . .
 
-RUN npm run build
+# Build the Angular application
+RUN npm run build --prod
 
-FROM httpd:alpine
+# Stage 2: Serve the application with a web server
+FROM nginx:alpine
 
-WORKDIR /usr/local/apache2/htdocs
+# Copy the built application from the previous stage
+COPY --from=build /usr/src/app/dist/user-registration/browser /usr/share/nginx/html
 
-COPY --from=build /app/dist/user-registration .
-
+# Expose port 80
 EXPOSE 80
 
-CMD ["httpd-foreground"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
